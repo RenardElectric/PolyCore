@@ -1,20 +1,19 @@
-package polycube.polycore.commands;
+package polycube.polycore.text;
 
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.ClickEvent;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.HoverEvent;
 import net.minecraft.network.chat.MutableComponent;
-import java.util.Locale;
 
 /// Shared, vanilla-client-compatible chat formatting. Never styles a caller's component in place.
 @SuppressWarnings("unused")
-public final class CommandText {
+public final class TextComponents {
     public static String modName = "";
 
-    private CommandText() {}
+    private TextComponents() {}
 
-    private static MutableComponent colored(String text, ChatFormatting color) {
+    public static MutableComponent colored(String text, ChatFormatting color) {
         return Component.literal(text).withStyle(color);
     }
 
@@ -113,11 +112,26 @@ public final class CommandText {
                 .append("\n").append(muted(command));
     }
 
-    private static String abbreviate(String text, int limit) {
-        return text.length() <= limit ? text : text.substring(0, limit - 1) + "…";
+    public static Component bullet(String text) {
+        return styled("• ", ChatFormatting.DARK_GRAY).append(styled(text, ChatFormatting.GREEN));
     }
 
-    private static String titleCase(String text) {
-        return text.substring(0, 1).toUpperCase(Locale.ROOT) + text.substring(1);
+    public static Component section(String title) {
+        return styled(title, ChatFormatting.GOLD, true);
+    }
+
+    public static MutableComponent detail(String label, String value, ChatFormatting valueColor) {
+        return styled(label + "  ", ChatFormatting.DARK_GRAY).append(styled(value, valueColor));
+    }
+
+    public static MutableComponent styled(String text, ChatFormatting color) {
+        return styled(text, color, false);
+    }
+
+    public static MutableComponent styled(String text, ChatFormatting color, boolean bold) {
+        return Component.literal(text).withStyle(style -> style
+                .withColor(color)
+                .withBold(bold)
+                .withItalic(false));
     }
 }

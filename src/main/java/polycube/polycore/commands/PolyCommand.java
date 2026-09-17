@@ -8,6 +8,7 @@ import net.minecraft.commands.Commands;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.permissions.Permission;
 import net.minecraft.server.permissions.PermissionLevel;
+import polycube.polycore.text.TextComponents;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -48,11 +49,11 @@ public abstract class PolyCommand {
     }
 
     protected Component getFullDescription() {
-        var message = CommandText.header("/" + modId + " " + name).append("\n" + getDescription());
-        if (permissionLevel != PermissionLevel.ALL) message.append(CommandText.muted(" (Admin only)"));
+        var message = TextComponents.header("/" + modId + " " + name).append("\n" + getDescription());
+        if (permissionLevel != PermissionLevel.ALL) message.append(TextComponents.muted(" (Admin only)"));
         for (String variant : usage.split(" \\| ")) {
             String command = "/" + modId + " " + name;
-            message.append("\n  ").append(CommandText.action(
+            message.append("\n  ").append(TextComponents.action(
                     command + (variant.isBlank() ? "" : " " + variant),
                     command + (variant.isBlank() ? "" : " ")));
         }
@@ -60,7 +61,7 @@ public abstract class PolyCommand {
             var shortcuts = new ArrayList<String>();
             shortcuts.add("/" + name);
             for (String alias : aliases) shortcuts.add("/" + alias);
-            message.append(CommandText.field("Shortcuts", CommandText.value(String.join(", ", shortcuts))));
+            message.append(TextComponents.field("Shortcuts", TextComponents.value(String.join(", ", shortcuts))));
         }
         return message.append("\n<...> required • [...] optional.");
     }
@@ -107,7 +108,7 @@ public abstract class PolyCommand {
     }
 
     protected int execute(CommandSourceStack source) throws CommandSyntaxException {
-        source.sendFailure(CommandText.error("Incomplete command. Choose one of the forms below.").append("\n").append(getFullDescription()));
+        source.sendFailure(TextComponents.error("Incomplete command. Choose one of the forms below.").append("\n").append(getFullDescription()));
         return 0;
     }
 }

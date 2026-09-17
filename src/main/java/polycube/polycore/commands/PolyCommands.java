@@ -8,6 +8,7 @@ import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
+import polycube.polycore.text.TextComponents;
 
 import java.util.Objects;
 
@@ -17,7 +18,7 @@ public final class PolyCommands {
     private PolyCommands() {}
 
     public static void registerCommands(String modId, String modName, Logger logger, PolyCommand... commands) {
-        CommandText.modName = modName;
+        TextComponents.modName = modName;
 
         var newCommands = new PolyCommand[commands.length + 1];
         System.arraycopy(commands, 0, newCommands, 0, commands.length);
@@ -45,7 +46,7 @@ public final class PolyCommands {
 
         if (optionalModData.isEmpty()) {
             logger.warn("Could not find {} metadata while handling the base command", modId);
-            cst.sendFailure(CommandText.error("Could not fetch mod information."));
+            cst.sendFailure(TextComponents.error("Could not fetch mod information."));
             return 0;
         }
         var modData = optionalModData.get();
@@ -53,11 +54,11 @@ public final class PolyCommands {
                 .map(Person::getName)
                 .reduce((a, b) -> a + " and " + b)
                 .orElse("Unknown authors");
-        var modInfo = CommandText.header(modData.getName())
-                .append(CommandText.muted(" v" + modData.getVersion().getFriendlyString()))
-                .append(CommandText.field("Made by", CommandText.value(authors)))
+        var modInfo = TextComponents.header(modData.getName())
+                .append(TextComponents.muted(" v" + modData.getVersion().getFriendlyString()))
+                .append(TextComponents.field("Made by", TextComponents.value(authors)))
                 .append("\n" + modData.getDescription())
-                .append("\n").append(CommandText.action("[View commands]", "/" + modId + " help"));
+                .append("\n").append(TextComponents.action("[View commands]", "/" + modId + " help"));
         cst.sendSuccess(() -> modInfo, false);
         return 1;
     }
