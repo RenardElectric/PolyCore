@@ -65,7 +65,7 @@ public final class TextUtil {
         return object.isEmpty() ? "any entity" : "entities with required traits";
     }
 
-    public String damageTarget(DynamicOps<JsonElement> ops, DamageSourcePredicate predicate) {
+    public static String damageTarget(DynamicOps<JsonElement> ops, DamageSourcePredicate predicate) {
         List<String> requirements = new ArrayList<>();
         for (var tag : predicate.tags()) {
             String target = holderSetName(tag.tag(), "specified damage");
