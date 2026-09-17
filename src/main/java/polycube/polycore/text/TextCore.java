@@ -4,6 +4,7 @@ import net.minecraft.resources.Identifier;
 
 import java.util.Locale;
 
+@SuppressWarnings("unused")
 public final class TextCore {
 
     private TextCore() {}

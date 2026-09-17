@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+@SuppressWarnings("unused")
 public final class TextUtil {
 
     private TextUtil() {}
@@ -38,7 +39,7 @@ public final class TextUtil {
         return predicate.components().isEmpty() ? target : target + " with required properties";
     }
 
-    private static String blockTarget(BlockPredicate predicate) {
+    public static String blockTarget(BlockPredicate predicate) {
         String target = predicate.blocks()
                 .map(blocks -> holderSetName(blocks, "matching blocks"))
                 .orElse("matching blocks");
@@ -123,7 +124,7 @@ public final class TextUtil {
         return fallback;
     }
 
-    private static List<Integer> incompleteFirst(
+    public static List<Integer> incompleteFirst(
             int size, JsonObject diagnostic,
             String field, boolean forceCompleted
     ) {
@@ -137,17 +138,17 @@ public final class TextUtil {
         return indices;
     }
 
-    private static boolean conditionCompleted(JsonObject diagnostic, boolean forceCompleted) {
+    public static boolean conditionCompleted(JsonObject diagnostic, boolean forceCompleted) {
         return forceCompleted || diagnostic.has("completed") && diagnostic.get("completed").getAsBoolean();
     }
 
-    private static JsonObject nestedDiagnostic(JsonObject diagnostic, String field) {
+    public static JsonObject nestedDiagnostic(JsonObject diagnostic, String field) {
         return diagnostic.has(field) && diagnostic.get(field).isJsonObject()
                 ? diagnostic.getAsJsonObject(field)
                 : new JsonObject();
     }
 
-    private static JsonObject indexedDiagnostic(JsonObject diagnostic, String field, int index) {
+    public static JsonObject indexedDiagnostic(JsonObject diagnostic, String field, int index) {
         if (!diagnostic.has(field) || !diagnostic.get(field).isJsonArray()) return new JsonObject();
 
         JsonArray values = diagnostic.getAsJsonArray(field);
@@ -156,7 +157,7 @@ public final class TextUtil {
                 : new JsonObject();
     }
 
-    private static List<String> descriptionLines(List<String> description, int descriptionWidth, int maxDescriptionLines) {
+    public static List<String> descriptionLines(List<String> description, int descriptionWidth, int maxDescriptionLines) {
         if (description.isEmpty()) {
             return List.of("No description provided.");
         }
@@ -186,7 +187,7 @@ public final class TextUtil {
         return abbreviated(new ArrayList<>(lines.subList(0, maxDescriptionLines)), descriptionWidth);
     }
 
-    private static List<String> abbreviated(List<String> lines, int descriptionWidth) {
+    public static List<String> abbreviated(List<String> lines, int descriptionWidth) {
         int last = lines.size() - 1;
         String value = lines.get(last);
         if (value.length() >= descriptionWidth) {
