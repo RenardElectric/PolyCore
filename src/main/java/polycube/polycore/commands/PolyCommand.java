@@ -48,8 +48,7 @@ public abstract class PolyCommand {
     }
 
     protected Component getFullDescription() {
-        var message = CommandText.header("/" + modId + " " + name)
-                .append("\n" + getDescription());
+        var message = CommandText.header("/" + modId + " " + name).append("\n" + getDescription());
         if (permissionLevel != PermissionLevel.ALL) message.append(CommandText.muted(" (Admin only)"));
         for (String variant : usage.split(" \\| ")) {
             String command = "/" + modId + " " + name;

@@ -10,6 +10,8 @@ import java.util.Locale;
 /// Shared, vanilla-client-compatible chat formatting. Never styles a caller's component in place.
 @SuppressWarnings("unused")
 public final class CommandText {
+    public static String modName = "";
+
     private CommandText() {}
 
     private static MutableComponent colored(String text, ChatFormatting color) {
@@ -18,7 +20,7 @@ public final class CommandText {
 
     public static MutableComponent message() {
         return Component.empty().withStyle(ChatFormatting.GRAY)
-                .append(colored("[PolyQuest] ", ChatFormatting.GOLD));
+                .append(colored("[" + modName + "] ", ChatFormatting.GOLD));
     }
 
     public static MutableComponent header(String title) {

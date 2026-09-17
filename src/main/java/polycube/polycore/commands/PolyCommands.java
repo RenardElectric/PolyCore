@@ -9,31 +9,32 @@ import net.minecraft.commands.Commands;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Objects;
 
 public final class PolyCommands {
-    private static @Nullable List<PolyCommand> commands;
+    private static PolyCommand @Nullable [] commands;
 
     private PolyCommands() {}
 
-    private static void registerCommands(String modId, Logger logger, List<PolyCommand> commands) {
-        List<PolyCommand> registeredCommands = new ArrayList<>(commands);
-        registeredCommands.add(new HelpCommand(modId));
-        PolyCommands.commands = registeredCommands;
+    public static void registerCommands(String modId, String modName, Logger logger, PolyCommand... commands) {
+        CommandText.modName = modName;
+
+        var newCommands = new PolyCommand[commands.length + 1];
+        System.arraycopy(commands, 0, newCommands, 0, commands.length);
+        newCommands[commands.length] = new HelpCommand(modId);
+        PolyCommands.commands = newCommands;
 
         CommandRegistrationCallback.EVENT.register((dispatcher, buildContext, _) -> {
             var baseCommand = Commands.literal(modId);
             baseCommand.executes(context -> printModInfo(modId, logger, context.getSource()));
-            for (PolyCommand command : registeredCommands) {
+            for (PolyCommand command : newCommands) {
                 for (var commandAlias : command.getCommands(buildContext)) {
                     baseCommand.then(commandAlias);
                     if (command.hasQuickAlias()) dispatcher.register(commandAlias);
                 }
             }
             dispatcher.register(baseCommand);
-            logger.debug("Registered {} {} subcommand(s)", registeredCommands.size(), modId);
+            logger.debug("Registered {} {} subcommand(s)", newCommands.length, modId);
         });
     }
 
@@ -61,7 +62,7 @@ public final class PolyCommands {
         return 1;
     }
 
-    public static List<PolyCommand> getCommands() {
+    public static PolyCommand[] getCommands() {
         return Objects.requireNonNull(commands, "PolyCommands are unavailable before registration");
     }
 }
