@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "id": "polycore",
+  "version": "${version}",
+  "name": "PolyCore",
+  "description": "TODO",
+  "authors": [],
+  "contact": {},
+  "license": "MIT",
+  "icon": "assets/polycore/icon.png",
+  "environment": "server",
+  "entrypoints": {
+    "main": [
+      "polycube.polycore.Polycore"
+    ]
+  },
+  "depends": {
+    "fabricloader": ">=${loader_version}",
+    "fabric-api": "*",
+    "minecraft": "${minecraft_version}"
+  }
+}
