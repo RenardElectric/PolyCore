@@ -4,16 +4,13 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.mojang.serialization.DynamicOps;
-import net.minecraft.ChatFormatting;
 import net.minecraft.advancements.predicates.BlockPredicate;
 import net.minecraft.advancements.predicates.DamageSourcePredicate;
 import net.minecraft.advancements.predicates.ItemPredicate;
 import net.minecraft.advancements.predicates.LocationPredicate;
 import net.minecraft.advancements.predicates.entity.EntityPredicate;
 import net.minecraft.core.HolderSet;
-import net.minecraft.network.chat.Component;
 
-import static polycube.polycore.text.TextComponents.*;
 import static polycube.polycore.text.TextCore.*;
 
 import java.util.ArrayList;
@@ -24,13 +21,6 @@ import java.util.Optional;
 public final class TextUtil {
 
     private TextUtil() {}
-
-    public static Component conditionRule(String prefix, String text, boolean completed) {
-        if (completed) {
-            return styled(prefix + text + " ✓", ChatFormatting.GREEN);
-        }
-        return styled(prefix, ChatFormatting.DARK_GRAY).append(styled(text, ChatFormatting.GRAY));
-    }
 
     public static String itemTarget(ItemPredicate predicate) {
         String target = predicate.items()
@@ -124,34 +114,16 @@ public final class TextUtil {
         return fallback;
     }
 
-    public static List<Integer> incompleteFirst(
-            int size, JsonObject diagnostic,
-            String field, boolean forceCompleted
-    ) {
-        List<Integer> indices = new ArrayList<>(size);
-        for (int index = 0; index < size; index++) {
-            indices.add(index);
-        }
-        indices.sort((left, right) -> Boolean.compare(
-                conditionCompleted(indexedDiagnostic(diagnostic, field, left), forceCompleted),
-                conditionCompleted(indexedDiagnostic(diagnostic, field, right), forceCompleted)));
-        return indices;
-    }
-
-    public static boolean conditionCompleted(JsonObject diagnostic, boolean forceCompleted) {
-        return forceCompleted || diagnostic.has("completed") && diagnostic.get("completed").getAsBoolean();
-    }
-
-    public static JsonObject nestedDiagnostic(JsonObject diagnostic, String field) {
-        return diagnostic.has(field) && diagnostic.get(field).isJsonObject()
-                ? diagnostic.getAsJsonObject(field)
+    public static JsonObject nestedJson(JsonObject json, String field) {
+        return json.has(field) && json.get(field).isJsonObject()
+                ? json.getAsJsonObject(field)
                 : new JsonObject();
     }
 
-    public static JsonObject indexedDiagnostic(JsonObject diagnostic, String field, int index) {
-        if (!diagnostic.has(field) || !diagnostic.get(field).isJsonArray()) return new JsonObject();
+    public static JsonObject indexedJson(JsonObject json, String field, int index) {
+        if (!json.has(field) || !json.get(field).isJsonArray()) return new JsonObject();
 
-        JsonArray values = diagnostic.getAsJsonArray(field);
+        JsonArray values = json.getAsJsonArray(field);
         return index < values.size() && values.get(index).isJsonObject()
                 ? values.get(index).getAsJsonObject()
                 : new JsonObject();
