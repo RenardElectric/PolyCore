@@ -67,6 +67,10 @@ public final class TextComponents {
         return Component.literal("\n  ").append(label).append(": ").append(value);
     }
 
+    public static MutableComponent indentedField(String label, Component value) {
+        return colored("\n    " + label + ": ", ChatFormatting.GRAY).append(value);
+    }
+
     public static MutableComponent badge() {
         return colored(" [default]", ChatFormatting.YELLOW);
     }
