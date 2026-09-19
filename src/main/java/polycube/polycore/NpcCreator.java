@@ -144,7 +144,7 @@ public final class NpcCreator {
         pos = pos.add(textOffset);
         textDisplay.snapTo(pos.x, pos.y, pos.z, yaw, pitch);
         try {
-            callback.update(textDisplay);
+            callback.update(textDisplay, mannequin);
             stateFor(level.getServer()).add(new NpcDescriptor(
                     type,
                     mannequin.getUUID(),
@@ -171,9 +171,10 @@ public final class NpcCreator {
                 if (!callback.onTick()) {
                     continue;
                 }
-                var entity = server.overworld().getEntityInAnyDimension(registration.getKey().textDisplayId());
-                if (entity instanceof Display.TextDisplay textDisplay) {
-                    callback.update(textDisplay);
+                var textEntity = server.overworld().getEntityInAnyDimension(registration.getKey().textDisplayId());
+                var mannequinEntity = server.overworld().getEntityInAnyDimension(registration.getKey().mannequinId());
+                if (textEntity instanceof Display.TextDisplay textDisplay && mannequinEntity instanceof Mannequin mannequin) {
+                    callback.update(textDisplay, mannequin);
                 }
             }
         });
@@ -352,13 +353,13 @@ public final class NpcCreator {
 
     /// Callback interface for NPC behavior. Implementations should be stateless and reconstructable from persisted data.
     public interface NpcCallback {
-        /// Called every tick for the NPC. Return true to update the text display, false to leave it as is.
+        /// Called every tick for the NPC. Return true to update the text display and mannequin after this tick.
         default boolean onTick() {
             return false;
         }
 
-        /// Called to update the text display for the NPC. This is called after onTick() if it returns true.
-        default void update(Display.TextDisplay textDisplay) {}
+        /// Called to update the text display and mannequin. This is called after onTick() returns true.
+        default void update(Display.TextDisplay textDisplay, Mannequin mannequin) {}
 
         /// Called when a player interacts with the NPC.
         default void onInteract(ServerPlayer player) {}
