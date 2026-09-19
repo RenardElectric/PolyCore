@@ -27,6 +27,7 @@ import net.minecraft.world.item.component.ResolvableProfile;
 import net.minecraft.world.item.component.SwingAnimation;
 import net.minecraft.world.level.saveddata.SavedData;
 import net.minecraft.world.level.saveddata.SavedDataType;
+import net.minecraft.world.phys.Vec2;
 import net.minecraft.world.phys.Vec3;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
@@ -74,15 +75,15 @@ public final class NpcCreator {
     /// Spawns an NPC whose callback can be reconstructed from {@code type} and empty callback data.
     public static DataResult<NpcCallback> summonNpc(
             ServerLevel level, Identifier type, ResolvableProfile skin,
-            Vec3 pos, float yaw, float pitch, Pose pose
+            Vec3 pos, Vec2 rotation, Pose pose
     ) {
-        return summonNpc(level, type, new CompoundTag(), skin, pos, yaw, pitch, pose);
+        return summonNpc(level, type, new CompoundTag(), skin, pos,rotation, pose);
     }
 
     /// Spawns an NPC whose callback can be reconstructed from {@code type} and {@code callbackData}.
     public static DataResult<NpcCallback> summonNpc(
             ServerLevel level, Identifier type, CompoundTag callbackData, ResolvableProfile skin,
-            Vec3 pos, float yaw, float pitch, Pose pose
+            Vec3 pos, Vec2 rotation, Pose pose
     ) {
         var textOffset = POSE_OFFSETS.get(pose);
         if (textOffset == null) {
@@ -117,8 +118,9 @@ public final class NpcCreator {
             return DataResult.error(() -> "Failed to create mannequin entity");
         }
 
-        mannequin.snapTo(pos.x, pos.y, pos.z, yaw, pitch);
-        mannequin.setYHeadRot(yaw);
+        mannequin.snapTo(pos.x, pos.y, pos.z, rotation.y, rotation.x);
+        mannequin.setYHeadRot(rotation.y);
+        mannequin.setYBodyRot(rotation.y);
         mannequin.setComponent(DataComponents.PROFILE, skin);
         mannequin.setPermanentlyInvulnerable(true);
         mannequin.setNoGravity(true);
@@ -142,7 +144,7 @@ public final class NpcCreator {
         }
 
         pos = pos.add(textOffset);
-        textDisplay.snapTo(pos.x, pos.y, pos.z, yaw, pitch);
+        textDisplay.snapTo(pos.x, pos.y, pos.z, 0.0F, rotation.x);
         try {
             callback.update(textDisplay, mannequin);
             stateFor(level.getServer()).add(new NpcDescriptor(
