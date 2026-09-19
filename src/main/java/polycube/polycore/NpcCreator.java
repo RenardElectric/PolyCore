@@ -170,7 +170,7 @@ public final class NpcCreator {
             var state = stateFor(server);
             for (var registration : state.registrations().entrySet()) {
                 var callback = registration.getValue();
-                if (!callback.onTick()) {
+                if (!callback.onTick(server)) {
                     continue;
                 }
                 var textEntity = server.overworld().getEntityInAnyDimension(registration.getKey().textDisplayId());
@@ -356,7 +356,7 @@ public final class NpcCreator {
     /// Callback interface for NPC behavior. Implementations should be stateless and reconstructable from persisted data.
     public interface NpcCallback {
         /// Called every tick for the NPC. Return true to update the text display and mannequin after this tick.
-        default boolean onTick() {
+        default boolean onTick(MinecraftServer server) {
             return false;
         }
 
