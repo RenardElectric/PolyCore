@@ -144,7 +144,7 @@ public final class NpcCreator {
         }
 
         pos = pos.add(textOffset);
-        textDisplay.snapTo(pos.x, pos.y, pos.z, 0.0F, rotation.x);
+        textDisplay.snapTo(pos.x, pos.y, pos.z, rotation.y, 0.0F);
         try {
             callback.update(textDisplay, mannequin);
             stateFor(level.getServer()).add(new NpcDescriptor(
