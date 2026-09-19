@@ -13,6 +13,7 @@ import polycube.polycore.text.TextComponents;
 import java.util.ArrayList;
 import java.util.List;
 
+@SuppressWarnings({"unused", "RedundantThrows"})
 public abstract class PolyCommand {
     final String modId;
     private final String name;

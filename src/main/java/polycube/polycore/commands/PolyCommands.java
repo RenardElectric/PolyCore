@@ -12,6 +12,7 @@ import polycube.polycore.text.TextComponents;
 
 import java.util.Objects;
 
+@SuppressWarnings("unused")
 public final class PolyCommands {
     private static PolyCommand @Nullable [] commands;
 
