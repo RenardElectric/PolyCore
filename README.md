@@ -5,7 +5,7 @@
 <h1 align="center">PolyCore</h1>
 
 <p align="center">
-  <strong>PolyCOre - A core library for PolyCube mods.</strong>
+  <strong>PolyCore - A core library for PolyCube mods.</strong>
 </p>
 
 <p align="center">
