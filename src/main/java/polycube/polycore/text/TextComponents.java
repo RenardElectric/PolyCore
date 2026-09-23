@@ -102,9 +102,13 @@ public final class TextComponents {
     }
 
     public static MutableComponent copy(String label, String copyText) {
+        return copy(label, copyText, Component.literal("Copy this text:\n" + copyText));
+    }
+
+    public static MutableComponent copy(String label, String copyText, Component hover) {
         return value(label).withStyle(style -> style.withUnderlined(true)
                 .withClickEvent(new ClickEvent.CopyToClipboard(copyText))
-                .withHoverEvent(new HoverEvent.ShowText(Component.literal("Copy this text:\n" + copyText))));
+                .withHoverEvent(new HoverEvent.ShowText(hover)));
     }
 
     public static MutableComponent confirmation(Component subject, Component consequences, String command) {
