@@ -64,7 +64,7 @@ public abstract class PolyCommand {
             for (String alias : aliases) shortcuts.add("/" + alias);
             message.append(TextComponents.field("Shortcuts", TextComponents.value(String.join(", ", shortcuts))));
         }
-        return message.append("\n<...> required • [...] optional.");
+        return message;
     }
 
     protected PermissionLevel getPermissionLevel() {
