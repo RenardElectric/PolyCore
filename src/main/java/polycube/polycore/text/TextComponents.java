@@ -92,7 +92,11 @@ public final class TextComponents {
     }
 
     public static MutableComponent action(String label, String command, Component hover) {
-        return value(label).withStyle(style -> style.withUnderlined(true)
+        return action(Component.literal(label), command, hover);
+    }
+
+    public static MutableComponent action(Component label, String command, Component hover) {
+        return label.copy().withStyle(style -> style.withUnderlined(true)
                 .withClickEvent(new ClickEvent.SuggestCommand(command))
                 .withHoverEvent(new HoverEvent.ShowText(hover)));
     }
