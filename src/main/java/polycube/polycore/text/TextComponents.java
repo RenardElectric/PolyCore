@@ -101,6 +101,20 @@ public final class TextComponents {
                 .withHoverEvent(new HoverEvent.ShowText(hover)));
     }
 
+    public static MutableComponent run(String label, String command) {
+        return run(label, command, Component.literal("Run this command:\n" + command));
+    }
+
+    public static MutableComponent run(String label, String command, Component hover) {
+        return run(Component.literal(label), command, hover);
+    }
+
+    public static MutableComponent run(Component label, String command, Component hover) {
+        return label.copy().withStyle(style -> style.withUnderlined(true)
+                .withClickEvent(new ClickEvent.RunCommand(command))
+                .withHoverEvent(new HoverEvent.ShowText(hover)));
+    }
+
     public static MutableComponent hover(Component label, Component hover) {
         return label.copy().withStyle(style -> style.withHoverEvent(new HoverEvent.ShowText(hover)));
     }
