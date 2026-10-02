@@ -18,24 +18,22 @@ public abstract class PolyCommand {
     final String modId;
     private final String name;
     private final String description;
-    private final String usage;
     private final PermissionLevel permissionLevel;
     private final boolean hasQuickAlias;
     private final List<String> aliases;
 
-    public PolyCommand(String modId, String name, String description, String usage, PermissionLevel permissionLevel) {
-        this(modId, name, description, usage, permissionLevel, false);
+    public PolyCommand(String modId, String name, String description, PermissionLevel permissionLevel) {
+        this(modId, name, description, permissionLevel, false);
     }
 
-    public PolyCommand(String modId, String name, String description, String usage, PermissionLevel permissionLevel, boolean hasQuickAlias) {
-        this(modId, name, description, usage, permissionLevel, hasQuickAlias, List.of());
+    public PolyCommand(String modId, String name, String description, PermissionLevel permissionLevel, boolean hasQuickAlias) {
+        this(modId, name, description, permissionLevel, hasQuickAlias, List.of());
     }
 
-    public PolyCommand(String modId, String name, String description, String usage, PermissionLevel permissionLevel, boolean hasQuickAlias, List<String> aliases) {
+    public PolyCommand(String modId, String name, String description, PermissionLevel permissionLevel, boolean hasQuickAlias, List<String> aliases) {
         this.modId = modId;
         this.name = name;
         this.description = description;
-        this.usage = usage;
         this.permissionLevel = permissionLevel;
         this.hasQuickAlias = hasQuickAlias;
         this.aliases = aliases;
@@ -49,24 +47,25 @@ public abstract class PolyCommand {
         return description.endsWith(".") ? description : description + ".";
     }
 
-    protected Component getFullDescription() {
-        var message = TextComponents.header("/" + modId + " " + name).append("\n" + getDescription());
-        if (permissionLevel != PermissionLevel.ALL) message.append(TextComponents.muted(" (Admin only)"));
-        for (String variant : usage.split(" \\| ")) {
-            String command = "/" + modId + " " + name;
-            message.append("\n  ").append(TextComponents.action(
-                    command + (variant.isBlank() ? "" : " " + variant),
-                    command + (variant.isBlank() ? "" : " ")));
+    protected Component getFullDescription(CommandSourceStack source) {
+        String path = this.modId + " " + this.name;
+        var message = TextComponents.header("/" + path).append("\n" + this.getDescription());
+        var node = PolyCommands.findNode(source, path);
+        if (node != null) {
+            for (var usage : source.getServer().getCommands().getDispatcher().getAllUsage(node, source, true)) {
+                if (usage.equals("help") || usage.endsWith(" help")) continue;
+                var command = "/" + path + (usage.isBlank() ? "" : " " + usage);
+                message.append("\n  ").append(TextComponents.run(command, "/" + path + " "));
+            }
         }
-        if (hasQuickAlias) {
+        if (this.hasQuickAlias) {
             var shortcuts = new ArrayList<String>();
-            shortcuts.add("/" + name);
-            for (String alias : aliases) shortcuts.add("/" + alias);
+            shortcuts.add("/" + this.name);
+            for (String alias : this.aliases) shortcuts.add("/" + alias);
             message.append(TextComponents.field("Shortcuts", TextComponents.value(String.join(", ", shortcuts))));
         }
         return message;
     }
-
     protected PermissionLevel getPermissionLevel() {
         return this.permissionLevel;
     }
@@ -84,7 +83,7 @@ public abstract class PolyCommand {
                 .requires(source -> hasPermission(source, permissionLevel))
                 .executes(e -> execute(e.getSource()))
                 .then(Commands.literal("help").executes(e -> {
-                    e.getSource().sendSuccess(this::getFullDescription, false);
+                    e.getSource().sendSuccess(() -> this.getFullDescription(e.getSource()), false);
                     return 1;
                 }));
 
@@ -109,7 +108,7 @@ public abstract class PolyCommand {
     }
 
     protected int execute(CommandSourceStack source) throws CommandSyntaxException {
-        source.sendFailure(TextComponents.error("Incomplete command. Choose one of the forms below.").append("\n").append(getFullDescription()));
+        source.sendFailure(TextComponents.error("Incomplete command. Choose one of the forms below.").append("\n").append(this.getFullDescription(source)));
         return 0;
     }
 }
