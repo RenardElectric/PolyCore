@@ -14,8 +14,8 @@ import java.util.List;
 public class HelpCommand extends PolyCommand {
     private static final int PAGE_SIZE = 6;
 
-    public HelpCommand(String modId) {
-        super(modId, "help", "Shows available commands and their usage", PermissionLevel.ALL);
+    public HelpCommand() {
+        super("help", "Shows available commands and their usage", PermissionLevel.ALL);
     }
 
     @Override
@@ -41,13 +41,13 @@ public class HelpCommand extends PolyCommand {
         try {
             return page(source, Integer.parseInt(argument));
         } catch (NumberFormatException ignored) {
-            for (PolyCommand command : visible(source)) {
+            for (var command : visible(source)) {
                 if (command.getName().equals(argument) || command.getAliases().contains(argument)) {
                     source.sendSuccess(() -> command.getFullDescription(source), false);
                     return 1;
                 }
             }
-            source.sendFailure(TextComponents.error("Unknown or unavailable command: " + argument));
+            source.sendFailure(textComponents.error("Unknown or unavailable command: " + argument));
             return 0;
         }
     }
@@ -56,10 +56,10 @@ public class HelpCommand extends PolyCommand {
         List<PolyCommand> visible = visible(source);
         int pages = Math.max(1, (visible.size() + PAGE_SIZE - 1) / PAGE_SIZE);
         if (page < 1 || page > pages) {
-            source.sendFailure(TextComponents.error("Choose a help page from 1 to " + pages + "."));
+            source.sendFailure(textComponents.error("Choose a help page from 1 to " + pages + "."));
             return 0;
         }
-        var message = TextComponents.header("Commands " + page + "/" + pages)
+        var message = textComponents.header("Commands " + page + "/" + pages)
                 .append("\nClick a command to prepare it; choose [Usage] for its syntax.");
         int end = Math.min(visible.size(), page * PAGE_SIZE);
         for (int i = (page - 1) * PAGE_SIZE; i < end; i++) {

@@ -2,12 +2,15 @@ package polycube.polycore.commands;
 
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import com.mojang.brigadier.exceptions.DynamicCommandExceptionType;
+import com.mojang.serialization.DataResult;
 import net.minecraft.commands.CommandBuildContext;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.permissions.Permission;
 import net.minecraft.server.permissions.PermissionLevel;
+import polycube.polycore.PolyCore;
 import polycube.polycore.text.TextComponents;
 
 import java.util.ArrayList;
@@ -15,28 +18,35 @@ import java.util.List;
 
 @SuppressWarnings({"unused", "RedundantThrows"})
 public abstract class PolyCommand {
-    final String modId;
     private final String name;
     private final String description;
     private final PermissionLevel permissionLevel;
     private final boolean hasQuickAlias;
     private final List<String> aliases;
 
-    public PolyCommand(String modId, String name, String description, PermissionLevel permissionLevel) {
-        this(modId, name, description, permissionLevel, false);
+    protected String modId = PolyCore.MOD_ID;
+    protected TextComponents textComponents = TextComponents.of(modId);
+
+    public PolyCommand(String name, String description, PermissionLevel permissionLevel) {
+        this(name, description, permissionLevel, false);
     }
 
-    public PolyCommand(String modId, String name, String description, PermissionLevel permissionLevel, boolean hasQuickAlias) {
-        this(modId, name, description, permissionLevel, hasQuickAlias, List.of());
+    public PolyCommand(String name, String description, PermissionLevel permissionLevel, boolean hasQuickAlias) {
+        this(name, description, permissionLevel, hasQuickAlias, List.of());
     }
 
-    public PolyCommand(String modId, String name, String description, PermissionLevel permissionLevel, boolean hasQuickAlias, List<String> aliases) {
-        this.modId = modId;
+    public PolyCommand(String name, String description, PermissionLevel permissionLevel, boolean hasQuickAlias, List<String> aliases) {
         this.name = name;
         this.description = description;
         this.permissionLevel = permissionLevel;
         this.hasQuickAlias = hasQuickAlias;
         this.aliases = aliases;
+    }
+
+    protected PolyCommand setInfo(String modId, String modName) {
+        this.modId = modId;
+        this.textComponents = TextComponents.of(modName);
+        return this;
     }
 
     protected String getName() {
@@ -49,7 +59,7 @@ public abstract class PolyCommand {
 
     protected Component getFullDescription(CommandSourceStack source) {
         String path = this.modId + " " + this.name;
-        var message = TextComponents.header("/" + path).append("\n" + this.getDescription());
+        var message = textComponents.header("/" + path).append("\n" + this.getDescription());
         var node = PolyCommands.findNode(source, path);
         if (node != null) {
             for (var usage : source.getServer().getCommands().getDispatcher().getAllUsage(node, source, true)) {
@@ -108,7 +118,20 @@ public abstract class PolyCommand {
     }
 
     protected int execute(CommandSourceStack source) throws CommandSyntaxException {
-        source.sendFailure(TextComponents.error("Incomplete command. Choose one of the forms below.").append("\n").append(this.getFullDescription(source)));
+        source.sendFailure(textComponents.error("Incomplete command. Choose one of the forms below.").append("\n").append(this.getFullDescription(source)));
         return 0;
+    }
+
+    public final class CommandResult {
+
+        private CommandResult() {}
+
+        private final DynamicCommandExceptionType ERROR = new DynamicCommandExceptionType(
+                message -> textComponents.error(message.toString())
+        );
+
+        public <T> T require(DataResult<T> result) throws CommandSyntaxException {
+            return result.getOrThrow(ERROR::create);
+        }
     }
 }

@@ -9,37 +9,43 @@ import net.minecraft.network.chat.MutableComponent;
 /// Shared, vanilla-client-compatible chat formatting. Never styles a caller's component in place.
 @SuppressWarnings("unused")
 public final class TextComponents {
-    public static String modName = "";
+    public String modName;
 
-    private TextComponents() {}
+    private TextComponents(String modName) {
+        this.modName = modName;
+    }
+
+    public static TextComponents of(String modName) {
+        return new TextComponents(modName);
+    }
 
     public static MutableComponent colored(String text, ChatFormatting color) {
         return Component.literal(text).withStyle(color);
     }
 
-    public static MutableComponent message() {
+    public MutableComponent message() {
         return Component.empty().withStyle(ChatFormatting.GRAY)
                 .append(colored("[" + modName + "] ", ChatFormatting.GOLD));
     }
 
-    public static MutableComponent header(String title) {
+    public  MutableComponent header(String title) {
         return message().append(colored(title, ChatFormatting.GOLD).withStyle(ChatFormatting.BOLD));
     }
 
-    public static MutableComponent success(String text) {
+    public  MutableComponent success(String text) {
         return message().append(colored(text, ChatFormatting.GREEN));
     }
 
-    public static MutableComponent error(String text) {
+    public MutableComponent error(String text) {
         return error(Component.literal(text));
     }
 
-    public static MutableComponent error(Component text) {
+    public MutableComponent error(Component text) {
         return message().append(colored("Error: ", ChatFormatting.RED))
                 .append(text.copy().withStyle(ChatFormatting.RED));
     }
 
-    public static MutableComponent warning(String text) {
+    public MutableComponent warning(String text) {
         return message().append(colored("Warning: " + text, ChatFormatting.YELLOW));
     }
 
@@ -79,11 +85,11 @@ public final class TextComponents {
         return colored(value ? "Yes" : "No", value ? ChatFormatting.GREEN : ChatFormatting.GRAY);
     }
 
-    public static MutableComponent property(Component subject, String label, Component value) {
+    public MutableComponent property(Component subject, String label, Component value) {
         return message().append(subject).append(field(label, value));
     }
 
-    public static MutableComponent updated(Component subject, String label, Component value) {
+    public MutableComponent updated(Component subject, String label, Component value) {
         return success("Updated ").append(subject).append(field(label, value));
     }
 
@@ -129,7 +135,7 @@ public final class TextComponents {
                 .withHoverEvent(new HoverEvent.ShowText(hover)));
     }
 
-    public static MutableComponent confirmation(Component subject, Component consequences, String command) {
+    public MutableComponent confirmation(Component subject, Component consequences, String command) {
         return warning("Delete ").append(subject).append("?")
                 .append(consequences)
                 .append(colored("\nThis cannot be undone. Do nothing to cancel.", ChatFormatting.RED))

@@ -24,16 +24,16 @@ public final class PolyCommands {
     private PolyCommands() {}
 
     public static void registerCommands(String modId, String modName, Logger logger, PolyCommand... commands) {
-        TextComponents.modName = modName;
         var registered = new ArrayList<>(List.of(commands));
-        registered.add(new HelpCommand(modId));
-        if (REGISTRATIONS.putIfAbsent(modId, new Registration(modName, List.copyOf(registered))) != null)
+        registered.add(new HelpCommand().setInfo(modId, modName));
+        if (REGISTRATIONS.putIfAbsent(modId, new Registration(modId, List.copyOf(registered))) != null)
             throw new IllegalStateException("Commands already registered for " + modId);
 
         CommandRegistrationCallback.EVENT.register((dispatcher, buildContext, _) -> {
             var baseCommand = Commands.literal(modId);
-            baseCommand.executes(context -> printModInfo(modId, logger, context.getSource()));
-            for (PolyCommand command : registered) {
+            baseCommand.executes(context -> printModInfo(modId, modName, logger, context.getSource()));
+            for (var command : registered) {
+                command.setInfo(modId, modName);
                 for (var commandAlias : command.getCommands(buildContext)) {
                     baseCommand.then(commandAlias);
                     if (command.hasQuickAlias()) dispatcher.register(commandAlias);
@@ -44,17 +44,17 @@ public final class PolyCommands {
         });
     }
 
-    public static int printModInfo(String modId, Logger logger, CommandSourceStack source) {
+    public static int printModInfo(String modId, String modName, Logger logger, CommandSourceStack source) {
         var optionalModData = FabricLoader.getInstance().getModContainer(modId).map(ModContainer::getMetadata);
         if (optionalModData.isEmpty()) {
             logger.warn("Could not find {} metadata while handling the base command", modId);
-            source.sendFailure(TextComponents.error("Could not fetch mod information."));
+            source.sendFailure(TextComponents.of(modId).error("Could not fetch mod information."));
             return 0;
         }
         var modData = optionalModData.get();
         var authors = modData.getAuthors().stream().map(Person::getName)
                 .reduce((a, b) -> a + " and " + b).orElse("Unknown authors");
-        var modInfo = TextComponents.header(modId)
+        var modInfo = TextComponents.of(modName).header(modId)
                 .append(TextComponents.muted(" v" + modData.getVersion().getFriendlyString()))
                 .append(TextComponents.field("Made by", TextComponents.value(authors)))
                 .append("\n" + modData.getDescription())
@@ -80,5 +80,5 @@ public final class PolyCommands {
         return Objects.requireNonNull(REGISTRATIONS.get(modId), "Commands are unavailable for " + modId);
     }
 
-    private record Registration(String modName, List<PolyCommand> commands) {}
+    private record Registration(String modId, List<PolyCommand> commands) {}
 }
