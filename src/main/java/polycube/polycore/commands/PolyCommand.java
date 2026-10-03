@@ -24,8 +24,9 @@ public abstract class PolyCommand {
     private final boolean hasQuickAlias;
     private final List<String> aliases;
 
-    protected String modId = PolyCore.MOD_ID;
-    protected TextComponents textComponents = TextComponents.of(modId);
+    public String modId = PolyCore.MOD_ID;
+    public TextComponents textComponents = TextComponents.of(modId);
+    public final CommandResult commandResult = new CommandResult();
 
     public PolyCommand(String name, String description, PermissionLevel permissionLevel) {
         this(name, description, permissionLevel, false);
