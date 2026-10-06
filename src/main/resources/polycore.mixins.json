@@ -1,0 +1,15 @@
+{
+  "required": true,
+  "package": "polycube.polycore.mixin",
+  "compatibilityLevel": "JAVA_25",
+  "plugin": "polycube.polycore.mixin.ConditionalCarpetMixinPlugin",
+  "mixins": [
+    "CarpetSpawnCommandMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  },
+  "overwrites": {
+    "requireAnnotations": true
+  }
+}
